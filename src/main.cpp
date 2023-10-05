@@ -139,6 +139,7 @@ bool searchOnCampus(std::string start = "BELL", std::string destination = "HAPG"
             paths.push_back(path);
             std::cout << std::endl;
         } else {
+            std::cout << "Wrongpath from " << start  << " to " << destination << " by the " << algName << " algorithm: " << start << std::endl;
             std::cout << "It seems that your " << algName << " was implemented incorrectly" << std::endl;
             return false;
         }

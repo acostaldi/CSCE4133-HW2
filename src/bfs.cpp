@@ -1,78 +1,64 @@
-#include <search.hpp>
-#include <queue>
-#include <iostream>
-
-
-template <class T>
-class LinkedListWrapper {
-public:
-    LinkedListWrapper(LinkedList<T>& list) : list(list) {}
-
-    typename LinkedList<T>::iterator begin() {
-        return list.begin();
-    }
-
-    typename LinkedList<T>::iterator end() {
-        return list.end();
-    }
-
-private:
-    LinkedList<T>& list;
-};
-
-template <class T>
-LinkedListWrapper<T> makeWrapper(LinkedList<T>& list) {
-    return LinkedListWrapper<T>(list);
-}
+#include "queue.hpp"
+#include "graph.hpp"
 
 int bfs(Graph &G, int start, int destination, int numberOfBuilding, std::vector<int> &path) {
-    // Please ignore the parameter of numberOfBuilding, this parameter is only used in DFS and Recursive DFS
-    // Return the number of shortest path
-
-    int N = G.n; // Number of nodes in the graph
-    std::vector<int> distance(N, -1);
-    std::vector<int> parent(N, -1);
-    std::queue<int> queue1;
-
-    distance[start] = 0;
-    queue1.push(start);
-
-    while(!queue1.empty()){
-        int current = queue1.front();
-        queue1.pop();
-
-    if(current == destination){
-        break;
-    }
+    int N = G.n;
+    bool visited[N] = {false};
+    int trace[N] = {-1};
+    int numPath[N] = {0};
     
-    LinkedListWrapper<int> adjacencyNodes(G.e[current]);
-    for (int neighborNode : adjacencyNodes){
-        if((distance[neighborNode]) == -1){
-            distance[neighborNode] == distance[current]+ 1;  
-            parent[neighborNode] == current;
-            queue1.push(neighborNode);
+    Queue<int> queue;
+    queue.push(start);
+    visited[start] = true;
+    numPath[start] = 1;
+    
+    while (!queue.empty()) {
+        int u = queue.pop();
+        
+        if (u == destination) {
+            break;
+        }
+        
+        LinkedList<int>& neighbors = G.e[u];
+        LinkedListNode<int>* currentNode = neighbors.getRoot();
+        while (currentNode) {
+            int v = currentNode->value;
+            if (!visited[v]) {
+                visited[v] = true;
+                trace[v] = u;
+                numPath[v] = numPath[u] + 1;
+                queue.push(v);
+            }
+            // Remove the else if condition that modifies numPath
+            currentNode = currentNode->next;
         }
     }
-}
-
-    int current = destination;
-        while (current != -1){
-        path.push_back(current);
-        current = parent[current];
-    }
-
-    std::reverse(path.begin(), path.end());
-
     
-    // Finally return the number of shorest paths
+    int u = destination;
+    while (u != -1) {
+        path.insert(path.begin(), u);
+        u = trace[u];
+    }
+    
+    // Count the number of shortest paths
     int shortestPathCount = 0;
-    LinkedListWrapper<int> adjacencyNodes(G.e[destination]);
-        for (int neighbor : adjacencyNodes) {
-            if (distance[neighbor] == distance[destination] - 1) {
+    for (int node = 0; node < N; ++node) {
+        if (node != start && node != destination && numPath[node] == numPath[destination] - 1) {
+            int current = node;
+            bool isShortestPath = true;
+            while (current != start) {
+                if (numPath[current] != numPath[trace[current]] + 1) {
+                    isShortestPath = false;
+                    break;
+                }
+                current = trace[current];
+            }
+            if (isShortestPath) {
                 shortestPathCount++;
             }
         }
+    }
     
-
-    return shortestPathCount; 
+    return shortestPathCount;
 }
+

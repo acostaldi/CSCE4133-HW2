@@ -1,19 +1,40 @@
-#include <search.hpp>
-
-/*
-To iterate over the adjancy nodes of u, you can use the following template code 
-int numberOfAdjacencyNodes = G.e[u].size(); // Get number of adjancy nodes of u 
-LinkedListNode<int> *p = G.e[u].getRoot(); // Get the head point of the linked list
-for (int i = 0; i < numberOfAdjacencyNodes; i += 1, p = p->next) { // iterate over each node
-    int v = p->value; // v is the adjvancy node of u
-    // YOUR CODE HERE
-}
-*/
+#include "stack.hpp"
+#include "graph.hpp"
 
 int dfs(Graph &G, int start, int destination, int numberOfBuilding, std::vector<int> &path) {
-    int N = G.n; // Number of nodes in the graph
+    int N = G.n;
+    bool visited[N] = {false};
+    int trace[N] = {-1};
     
-    //YOUR CODE HERE 
-
-    return 0; //You do not need to count the number of paths in this question, therefore, just simply return 0
+    Stack<int> stack;
+    stack.push(start);
+    visited[start] = true;
+    
+    while (!stack.empty()) {
+        int u = stack.pop();
+        
+        if (u == destination) {
+            break;
+        }
+        
+        LinkedList<int>& neighbors = G.e[u];
+        LinkedListNode<int>* currentNode = neighbors.getRoot();
+        while (currentNode) {
+            int v = currentNode->value;
+            if (!visited[v]) {
+                visited[v] = true;
+                trace[v] = u;
+                stack.push(v);
+            }
+            currentNode = currentNode->next;
+        }
+    }
+    
+    int u = destination;
+    while (u != -1) {
+        path.insert(path.begin(), u);
+        u = trace[u];
+    }
+    
+    return 0; // DFS does not compute the number of shortest paths
 }

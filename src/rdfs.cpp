@@ -1,19 +1,42 @@
-#include <search.hpp>
-/*
-To iterate over the adjancy nodes of u, you can use the following template code 
-int numberOfAdjacencyNodes = G.e[u].size(); // Get number of adjancy nodes of u 
-LinkedListNode<int> *p = G.e[u].getRoot(); // Get the head point of the linked list
-for (int i = 0; i < numberOfAdjacencyNodes; i += 1, p = p->next) { // iterate over each node
-    int v = p->value; // v is the adjvancy node of u
-    // YOUR CODE HERE
+#include "graph.hpp"
+
+int DFS(int u, Graph &G, std::vector<int> &path, std::vector<int> &visited, int destination, int numberOfBuilding) {
+    path.push_back(u);
+    visited[u] = 1; // Use 1 to represent visited in the visited vector
+
+    if (u == destination) {
+        return 1;
+    }
+
+    int neighborsVisited = 0; // Track the number of visited neighbors
+
+    LinkedList<int>& neighbors = G.e[u];
+    LinkedListNode<int>* currentNode = neighbors.getRoot();
+    while (currentNode && neighborsVisited < numberOfBuilding) {
+        int v = currentNode->value;
+        if (!visited[v]) {
+            int flag = DFS(v, G, path, visited, destination, numberOfBuilding);
+            if (flag == 1) {
+                return 1;
+            }
+            neighborsVisited++; // Increment visited neighbors count
+        }
+        currentNode = currentNode->next;
+    }
+
+    path.pop_back();
+    return 0;
 }
-*/
 
 int rdfs(Graph &G, int start, int destination, int numberOfBuilding, std::vector<int> &path) {
-    int N = G.n; // Number of nodes in the graph
-    
-    // YOUR CODE HERE
+    int N = G.n;
+    std::vector<int> visited(N, 0); // Initialize with 0 to represent unvisited
 
-    return 0; //You do not need to count the number of paths in this question, therefore, just simply return 0
+    int result = DFS(start, G, path, visited, destination, numberOfBuilding);
+
+    if (path.size() > numberOfBuilding) {
+        return 0; // Limit path size to numberOfBuilding
+    }
+
+    return 0; // rdfs returns 0
 }
-
